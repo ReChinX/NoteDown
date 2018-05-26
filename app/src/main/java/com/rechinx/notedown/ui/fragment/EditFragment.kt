@@ -102,13 +102,15 @@ class EditFragment: BaseFragment() {
             }
         }else {
             var item = fromNoteItem
-            item.title = mEdit.text.toString()
-            item.detail = mEdit.text.toString()
-            item.updatedAt = System.currentTimeMillis()
-            disposable.add(viewModel.updateNote(item)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe({}, { error -> Log.e(TAG, "Unable to update note $error")}))
+            if(item.detail != mEdit.text.toString()) {
+                item.title = mEdit.text.toString()
+                item.detail = mEdit.text.toString()
+                item.updatedAt = System.currentTimeMillis()
+                disposable.add(viewModel.updateNote(item)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe({}, { error -> Log.e(TAG, "Unable to update note $error")}))
+            }
         }
     }
 
