@@ -13,7 +13,7 @@ import com.rechinx.notedown.R
 import com.rechinx.notedown.model.NoteItem
 import com.rechinx.notedown.ui.activity.MainActivity
 import com.rechinx.notedown.utils.VectorDrawableUtils
-import kotlinx.android.synthetic.main.item_list_note.view.*
+import kotlinx.android.synthetic.main.list_item_note.view.*
 
 class NoteAdapter(data: List<NoteItem>, context: Context): RecyclerView.Adapter<NoteAdapter.ViewHolder>() {
 
@@ -30,7 +30,7 @@ class NoteAdapter(data: List<NoteItem>, context: Context): RecyclerView.Adapter<
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        var view = LayoutInflater.from(parent.context).inflate(R.layout.item_list_note, parent, false)
+        var view = LayoutInflater.from(parent.context).inflate(R.layout.list_item_note, parent, false)
         return ViewHolder(view)
     }
 
@@ -75,19 +75,15 @@ class NoteAdapter(data: List<NoteItem>, context: Context): RecyclerView.Adapter<
                 if(BuildConfig.DEBUG) {
                     Log.d(TAG, "current $position is selected")
                 }
-                itemView.iv_img.background = VectorDrawableUtils.getCircleDrawableDark(mContext)
-                itemView.layout_item.background = VectorDrawableUtils.getItemSelectDrawable(mContext)
+                itemView.framelayout_content.isSelected = true
             }else {
                 if(BuildConfig.DEBUG) {
                     Log.d(TAG, "current $position is unselected")
                 }
-                itemView.layout_item.background = VectorDrawableUtils.getItemCommonDrawable(mContext)
-                itemView.iv_img.background = VectorDrawableUtils.getCircleDrawable(mContext)
+                itemView.framelayout_content.isSelected = false
             }
             itemView.tv_modify_time.text = data.updatedAt.toString()
             itemView.tv_title.text = data.title
-            itemView.tv_note_detail.text = data.detail
-            itemView.iv_img.text = if(data.title!!.isNotEmpty()) data.title!!.substring(0, 1).toUpperCase() else "无"
             itemView.setOnClickListener({
                 if(mOnItemTouchListener != null) {
                     mOnItemTouchListener.onClick(it, position)

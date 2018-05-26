@@ -81,6 +81,8 @@ class MainFragment: Fragment() {
 
         recyclerView.layoutManager = LinearLayoutManager(context)
         adapter = NoteAdapter(data, context!!)
+        preset.clear()
+        adapter.clearPreset()
         recyclerView.adapter = adapter
         adapter.setOnItemClickListener(object : NoteAdapter.OnItemClickListener {
             override fun onLongClick(view: View, adapterPosition: Int) {

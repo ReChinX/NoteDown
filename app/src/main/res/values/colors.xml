@@ -16,4 +16,7 @@
 
     <color name="text_line_divider">#efefef</color>
     <color name="btn_common_press">#b4b4b4</color>
+    <color name="grey">#ABABAB</color>
+
+    <color name="windowBackgroundColor">#fff1f1f1</color>
 </resources>
