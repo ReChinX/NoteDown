@@ -12,6 +12,7 @@ import com.rechinx.notedown.BuildConfig
 import com.rechinx.notedown.R
 import com.rechinx.notedown.model.NoteItem
 import com.rechinx.notedown.ui.activity.MainActivity
+import com.rechinx.notedown.utils.FuzzyDateFormatter
 import com.rechinx.notedown.utils.VectorDrawableUtils
 import kotlinx.android.synthetic.main.list_item_note.view.*
 
@@ -82,7 +83,7 @@ class NoteAdapter(data: List<NoteItem>, context: Context): RecyclerView.Adapter<
                 }
                 itemView.framelayout_content.isSelected = false
             }
-            itemView.tv_modify_time.text = data.updatedAt.toString()
+            itemView.tv_modify_time.text = FuzzyDateFormatter.format(data.updatedAt!!)
             itemView.tv_title.text = data.title
             itemView.setOnClickListener({
                 if(mOnItemTouchListener != null) {

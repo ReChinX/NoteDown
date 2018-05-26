@@ -5,7 +5,7 @@ import android.arch.persistence.room.Entity
 import android.arch.persistence.room.PrimaryKey
 
 @Entity
-class NoteItem {
+class NoteItem{
 
     @PrimaryKey(autoGenerate = true)
     var objectId: Int? = null

@@ -27,6 +27,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_main.*
 import io.reactivex.disposables.CompositeDisposable
+import java.util.*
 
 
 class MainFragment: Fragment() {
@@ -66,6 +67,7 @@ class MainFragment: Fragment() {
                 .subscribe({
                     data.clear()
                     data = it as ArrayList<NoteItem>
+                    data.sortWith(Comparator { o1, o2 -> -o1!!.updatedAt!!.compareTo(o2!!.updatedAt!!) })
                     if(BuildConfig.DEBUG) {
                         Log.d(TAG, "item number is: " + data.size)
                     }
