@@ -3,6 +3,7 @@ package com.rechinx.notedown.ui.view
 
 import android.content.Context
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Paint
 import android.support.v7.widget.AppCompatEditText
 import android.text.Editable
@@ -23,33 +24,33 @@ class MultiLineDividerEditText : RichEditText {
 
     @JvmOverloads
     constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0): super(context, attrs, defStyleAttr) {
-        ITEM_HEIGHT = resources.getDimension(R.dimen.note_detail_item_height).toInt().toFloat()
-        addTextChangedListener(object : android.text.TextWatcher {
-            override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
-                if (textWatcher != null) {
-                    textWatcher!!.beforeTextChanged(charSequence, i, i1, i2)
-                }
-            }
-
-            override fun onTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
-                val add = ITEM_HEIGHT
-
-                setLineSpacing(0f, 1f)
-                setLineSpacing(add, 0f)
-                includeFontPadding = false
-                val top = ((add - textSize) * 0.5f).toInt()
-                setPadding(paddingLeft, top, paddingRight, -top)
-                if (textWatcher != null) {
-                    textWatcher!!.onTextChanged(charSequence, i, i1, i2)
-                }
-            }
-
-            override fun afterTextChanged(editable: Editable) {
-                if (textWatcher != null) {
-                    textWatcher!!.afterTextChanged(editable)
-                }
-            }
-        })
+//        ITEM_HEIGHT = resources.getDimension(R.dimen.note_detail_item_height).toInt().toFloat()
+//        addTextChangedListener(object : android.text.TextWatcher {
+//            override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
+//                if (textWatcher != null) {
+//                    textWatcher!!.beforeTextChanged(charSequence, i, i1, i2)
+//                }
+//            }
+//
+//            override fun onTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
+//                val add = ITEM_HEIGHT
+//
+//                setLineSpacing(0f, 1f)
+//                setLineSpacing(add, 0f)
+//                includeFontPadding = false
+//                val top = ((add - textSize) * 0.5f).toInt()
+//                setPadding(paddingLeft, top, paddingRight, -top)
+//                if (textWatcher != null) {
+//                    textWatcher!!.onTextChanged(charSequence, i, i1, i2)
+//                }
+//            }
+//
+//            override fun afterTextChanged(editable: Editable) {
+//                if (textWatcher != null) {
+//                    textWatcher!!.afterTextChanged(editable)
+//                }
+//            }
+//        })
         mPaint = Paint()
         mPaint.color = resources.getColor(R.color.text_line_divider)
         mPaint.strokeWidth = 1.0f
@@ -65,29 +66,28 @@ class MultiLineDividerEditText : RichEditText {
         var baseline = baseline
         var lineCnt = lineCount
         val pageLineCnt = etHeight / lHeight
-        val offset = lHeight / 5
+        val offset = lHeight / 3
 
         if (lineCnt < pageLineCnt) {
             lineCnt = pageLineCnt
         }
 
         for (i in 0 until lineCnt) {
-
-            canvas.drawLine(0f, (baseline + offset).toFloat(), etWidth.toFloat(), (baseline + offset).toFloat(), mPaint)
+            //canvas.drawLine(0f, (baseline + offset).toFloat(), etWidth.toFloat(), (baseline + offset).toFloat(), mPaint)
             baseline += lHeight
 
         }
 
-        if (!reLayout) {
-            reLayout = true
-            val add = ITEM_HEIGHT
-            includeFontPadding = false
-            setLineSpacing(add, 0f)
-            val top = ((add - textSize) * 0.5f).toInt()
-            setPadding(paddingLeft, top, paddingRight, -top)
-            requestLayout()
-            invalidate()
-        }
+//        if (!reLayout) {
+//            reLayout = true
+//            val add = ITEM_HEIGHT
+//            includeFontPadding = false
+//            setLineSpacing(add, 0f)
+//            val top = ((add - textSize) * 0.5f).toInt()
+//            setPadding(paddingLeft, top, paddingRight, -top)
+//            requestLayout()
+//            invalidate()
+//        }
     }
 
     fun addTextWatcher(textWatcher: TextWatcher) {

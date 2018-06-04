@@ -22,6 +22,9 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_edit.*
+import android.content.Intent
+import com.scrat.app.richtext.RichEditText
+
 
 class EditFragment: BaseFragment() {
 
@@ -29,7 +32,7 @@ class EditFragment: BaseFragment() {
 
     private lateinit var toolbar: Toolbar
     private lateinit var mFab: FloatingActionButton
-    private lateinit var mEdit: MultiLineDividerEditText
+    private lateinit var mEdit: RichEditText
     private lateinit var viewModel: NoteViewModel
     private lateinit var viewModelFactory: NoteViewModelFactory
 
@@ -37,8 +40,6 @@ class EditFragment: BaseFragment() {
     private lateinit var fromNoteItem: NoteItem
 
     private val disposable = CompositeDisposable()
-
-    private var lastScrollY: Int = 0
 
     private var noteContent:String ?= "test\n"
     private var menuFlag: Boolean = false
@@ -58,6 +59,9 @@ class EditFragment: BaseFragment() {
         viewModelFactory = Utility.provideViewModelFactory(activity!!)
         viewModel = ViewModelProviders.of(activity!!, viewModelFactory).get(NoteViewModel::class.java)
 
+        // init ui
+        mEdit = view.findViewById(R.id.et_note_item)
+
         // get note_id from list
         fromObjectId = arguments?.getInt(EXTRA_ID, -1) ?: -1
         if(fromObjectId != -1) {
@@ -67,12 +71,10 @@ class EditFragment: BaseFragment() {
                     .subscribe({
                         fromNoteItem = it
                         noteContent = it.detail
-                        et_note_item.setText(noteContent)
+                        mEdit.fromHtml(noteContent)
                     }, {Log.e(TAG, "Unable to get noteitem")}))
         }
 
-        // init ui
-        mEdit = view.findViewById(R.id.et_note_item)
         setupUI()
     }
 
@@ -106,11 +108,11 @@ class EditFragment: BaseFragment() {
     fun saveNote() {
         if(BuildConfig.DEBUG) {
             Log.d(TAG, "enter the saving notes function")
-            Log.d(TAG, "Edit text: " + mEdit.text)
+            Log.d(TAG, "Edit text: " + mEdit.toHtml())
         }
         if(fromObjectId == -1) {
-            if(!TextUtils.isEmpty(mEdit.text) && mEdit.text.toString() != "\n") {
-                val item = NoteItem(mEdit.text.toString(), mEdit.text.toString(), System.currentTimeMillis(), System.currentTimeMillis())
+            if(!TextUtils.isEmpty(mEdit.toHtml()) && mEdit.toHtml() != "\n") {
+                val item = NoteItem(mEdit.toHtml(), mEdit.toHtml(), System.currentTimeMillis(), System.currentTimeMillis())
                 disposable.add(viewModel.insertNote(item)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
@@ -118,9 +120,9 @@ class EditFragment: BaseFragment() {
             }
         }else {
             var item = fromNoteItem
-            if(item.detail != mEdit.text.toString()) {
-                item.title = mEdit.text.toString()
-                item.detail = mEdit.text.toString()
+            if(item.detail != mEdit.toHtml()) {
+                item.title = mEdit.toHtml()
+                item.detail = mEdit.toHtml()
                 item.updatedAt = System.currentTimeMillis()
                 disposable.add(viewModel.updateNote(item)
                         .subscribeOn(Schedulers.io())
@@ -168,12 +170,29 @@ class EditFragment: BaseFragment() {
                 }
                 mEdit.undo()
             }
+            R.id.menu_edit_pic -> inseartImage()
         }
         return super.onOptionsItemSelected(item)
     }
 
+    fun inseartImage() {
+        val getImage = Intent(Intent.ACTION_GET_CONTENT)
+        getImage.addCategory(Intent.CATEGORY_OPENABLE)
+        getImage.type = "image/*"
+        startActivityForResult(getImage, REQUEST_CODE_GET_CONTENT)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (data?.data == null)
+            return;
+        val uri = data.getData()
+        val width = mEdit.measuredWidth - mEdit.paddingLeft - mEdit.paddingRight
+        mEdit.image(uri, width)
+    }
+
     companion object {
         private val EXTRA_ID = "note_id"
+        private val REQUEST_CODE_GET_CONTENT = 666
 
         fun newInstance() = EditFragment()
 

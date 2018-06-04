@@ -7,6 +7,9 @@
     <item android:id="@+id/menu_edit_redo"
         android:title="@string/menu_edit_redo"
         app:showAsAction="always"/>
+    <item android:id="@+id/menu_edit_pic"
+        android:title="@string/menu_edit_pic"
+        app:showAsAction="always"/>
     <item android:id="@+id/menu_edit_ok"
         android:title="@string/menu_edit_ok"
         app:showAsAction="always"/>
