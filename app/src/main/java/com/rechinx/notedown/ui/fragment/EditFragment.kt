@@ -112,7 +112,7 @@ class EditFragment: BaseFragment() {
         }
         if(fromObjectId == -1) {
             if(!TextUtils.isEmpty(mEdit.toHtml()) && mEdit.toHtml() != "\n") {
-                val item = NoteItem(mEdit.toHtml(), mEdit.toHtml(), System.currentTimeMillis(), System.currentTimeMillis())
+                val item = NoteItem(mEdit.text.toString(), mEdit.toHtml(), System.currentTimeMillis(), System.currentTimeMillis())
                 disposable.add(viewModel.insertNote(item)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
@@ -121,7 +121,7 @@ class EditFragment: BaseFragment() {
         }else {
             var item = fromNoteItem
             if(item.detail != mEdit.toHtml()) {
-                item.title = mEdit.toHtml()
+                item.title = mEdit.text.toString()
                 item.detail = mEdit.toHtml()
                 item.updatedAt = System.currentTimeMillis()
                 disposable.add(viewModel.updateNote(item)
