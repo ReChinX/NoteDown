@@ -13,6 +13,7 @@ import com.rechinx.notedown.R
 import com.rechinx.notedown.base.BaseFragment
 import com.rechinx.notedown.model.NoteItem
 import com.rechinx.notedown.ui.view.MultiLineDividerEditText
+import com.rechinx.notedown.utils.KeyboardStatusDetector
 import com.rechinx.notedown.utils.Utility
 import com.rechinx.notedown.utils.VectorDrawableUtils
 import com.rechinx.notedown.viewmodel.NoteViewModel
@@ -40,6 +41,12 @@ class EditFragment: BaseFragment() {
     private var lastScrollY: Int = 0
 
     private var noteContent:String ?= "test\n"
+    private var menuFlag: Boolean = false
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_edit, container, false)
@@ -79,11 +86,20 @@ class EditFragment: BaseFragment() {
         toolbar = activity!!.findViewById<Toolbar>(R.id.toolbar)
         toolbar.title = "编辑"
         toolbar.navigationIcon = VectorDrawableUtils.getBackDrawable(context)
-        setHasOptionsMenu(true)
 
         // floating action bar
         mFab = activity!!.findViewById<FloatingActionButton>(R.id.fab)
         mFab.visibility = View.INVISIBLE
+
+        // keyboard detector
+        KeyboardStatusDetector().registerView(view!!.rootView)
+                .setmVisibilityListener(object : KeyboardStatusDetector.KeyboardVisibilityListener {
+                    override fun onVisibilityChanged(keyboardVisible: Boolean) {
+                        menuFlag = keyboardVisible
+                        activity?.invalidateOptionsMenu()
+                        mEdit.isCursorVisible = keyboardVisible
+                    }
+                })
     }
 
 
@@ -120,16 +136,40 @@ class EditFragment: BaseFragment() {
             Log.d(TAG, "Enter EditFragment onResume")
         }
     }
+
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        menu.clear()
+        val menuInflater = activity!!.menuInflater
+        if(menuFlag) {
+            menuInflater.inflate(R.menu.menu_edit, menu)
+        }else {
+            menuInflater.inflate(R.menu.menu_preview, menu)
+        }
+        super.onPrepareOptionsMenu(menu)
+    }
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         menu.clear()
-        inflater.inflate(R.menu.main, menu)
+        inflater.inflate(R.menu.menu_edit, menu)
+        super.onCreateOptionsMenu(menu, inflater)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId) {
-
+            R.id.menu_edit_redo -> {
+                if(BuildConfig.DEBUG) {
+                    Log.d(TAG, "now is redo operation")
+                }
+                mEdit.redo()
+            }
+            R.id.menu_edit_undo -> {
+                if(BuildConfig.DEBUG) {
+                    Log.d(TAG, "now is undo operation")
+                }
+                mEdit.undo()
+            }
         }
-        return true
+        return super.onOptionsItemSelected(item)
     }
 
     companion object {
