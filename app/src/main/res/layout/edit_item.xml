@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.rechinx.notedown.support.expandtededittext.AdvancedEditView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/transparent"
+    android:cursorVisible="true"
+    android:focusableInTouchMode="true"
+    android:gravity="center_vertical"
+    android:paddingLeft="6dp"
+    android:paddingRight="1dp"
+    android:textColor="@color/textColor1"
+    android:textCursorDrawable="@drawable/text_cursor"
+    android:textSize="18dp" >
+
+</com.rechinx.notedown.support.expandtededittext.AdvancedEditView>

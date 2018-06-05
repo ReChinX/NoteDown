@@ -2,17 +2,14 @@ package com.rechinx.notedown.ui.fragment
 
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
-import android.os.SystemClock
 import android.support.design.widget.FloatingActionButton
 import android.support.v7.widget.Toolbar
-import android.text.TextUtils
 import android.util.Log
 import android.view.*
 import com.rechinx.notedown.BuildConfig
 import com.rechinx.notedown.R
 import com.rechinx.notedown.base.BaseFragment
 import com.rechinx.notedown.model.NoteItem
-import com.rechinx.notedown.ui.view.MultiLineDividerEditText
 import com.rechinx.notedown.utils.KeyboardStatusDetector
 import com.rechinx.notedown.utils.Utility
 import com.rechinx.notedown.utils.VectorDrawableUtils
@@ -21,9 +18,8 @@ import com.rechinx.notedown.viewmodel.NoteViewModelFactory
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.fragment_edit.*
 import android.content.Intent
-import com.scrat.app.richtext.RichEditText
+import com.rechinx.notedown.support.expandtededittext.ExpandedEditText
 
 
 class EditFragment: BaseFragment() {
@@ -32,7 +28,7 @@ class EditFragment: BaseFragment() {
 
     private lateinit var toolbar: Toolbar
     private lateinit var mFab: FloatingActionButton
-    private lateinit var mEdit: RichEditText
+    private lateinit var mEdit: ExpandedEditText
     private lateinit var viewModel: NoteViewModel
     private lateinit var viewModelFactory: NoteViewModelFactory
 
@@ -71,7 +67,7 @@ class EditFragment: BaseFragment() {
                     .subscribe({
                         fromNoteItem = it
                         noteContent = it.detail
-                        mEdit.fromHtml(noteContent)
+                        //mEdit.fromHtml(noteContent)
                     }, {Log.e(TAG, "Unable to get noteitem")}))
         }
 
@@ -81,7 +77,7 @@ class EditFragment: BaseFragment() {
     override fun onDestroy() {
         super.onDestroy()
         hideKeyboard()
-        saveNote()
+        //saveNote()
     }
     private fun setupUI() {
         // Toolbar setting
@@ -99,38 +95,38 @@ class EditFragment: BaseFragment() {
                     override fun onVisibilityChanged(keyboardVisible: Boolean) {
                         menuFlag = keyboardVisible
                         activity?.invalidateOptionsMenu()
-                        mEdit.isCursorVisible = keyboardVisible
+                        //mEdit.isCursorVisible = keyboardVisible
                     }
                 })
     }
 
-
-    fun saveNote() {
-        if(BuildConfig.DEBUG) {
-            Log.d(TAG, "enter the saving notes function")
-            Log.d(TAG, "Edit text: " + mEdit.toHtml())
-        }
-        if(fromObjectId == -1) {
-            if(!TextUtils.isEmpty(mEdit.toHtml()) && mEdit.toHtml() != "\n") {
-                val item = NoteItem(mEdit.text.toString(), mEdit.toHtml(), System.currentTimeMillis(), System.currentTimeMillis())
-                disposable.add(viewModel.insertNote(item)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe({}, { error -> Log.e(TAG, "Unable to insert note $error")}))
-            }
-        }else {
-            var item = fromNoteItem
-            if(item.detail != mEdit.toHtml()) {
-                item.title = mEdit.text.toString()
-                item.detail = mEdit.toHtml()
-                item.updatedAt = System.currentTimeMillis()
-                disposable.add(viewModel.updateNote(item)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe({}, { error -> Log.e(TAG, "Unable to update note $error")}))
-            }
-        }
-    }
+//
+//    fun saveNote() {
+//        if(BuildConfig.DEBUG) {
+//            Log.d(TAG, "enter the saving notes function")
+//            Log.d(TAG, "Edit text: " + mEdit.toHtml())
+//        }
+//        if(fromObjectId == -1) {
+//            if(!TextUtils.isEmpty(mEdit.toHtml()) && mEdit.toHtml() != "\n") {
+//                val item = NoteItem(mEdit.text.toString(), mEdit.toHtml(), System.currentTimeMillis(), System.currentTimeMillis())
+//                disposable.add(viewModel.insertNote(item)
+//                        .subscribeOn(Schedulers.io())
+//                        .observeOn(AndroidSchedulers.mainThread())
+//                        .subscribe({}, { error -> Log.e(TAG, "Unable to insert note $error")}))
+//            }
+//        }else {
+//            var item = fromNoteItem
+//            if(item.detail != mEdit.toHtml()) {
+//                item.title = mEdit.text.toString()
+//                item.detail = mEdit.toHtml()
+//                item.updatedAt = System.currentTimeMillis()
+//                disposable.add(viewModel.updateNote(item)
+//                        .subscribeOn(Schedulers.io())
+//                        .observeOn(AndroidSchedulers.mainThread())
+//                        .subscribe({}, { error -> Log.e(TAG, "Unable to update note $error")}))
+//            }
+//        }
+//    }
 
     override fun onResume() {
         super.onResume()
@@ -162,20 +158,20 @@ class EditFragment: BaseFragment() {
                 if(BuildConfig.DEBUG) {
                     Log.d(TAG, "now is redo operation")
                 }
-                mEdit.redo()
+                //mEdit.redo()
             }
             R.id.menu_edit_undo -> {
                 if(BuildConfig.DEBUG) {
                     Log.d(TAG, "now is undo operation")
                 }
-                mEdit.undo()
+                //mEdit.undo()
             }
-            R.id.menu_edit_pic -> inseartImage()
+            R.id.menu_edit_pic -> insertImage()
         }
         return super.onOptionsItemSelected(item)
     }
 
-    fun inseartImage() {
+    fun insertImage() {
         val getImage = Intent(Intent.ACTION_GET_CONTENT)
         getImage.addCategory(Intent.CATEGORY_OPENABLE)
         getImage.type = "image/*"
@@ -187,7 +183,7 @@ class EditFragment: BaseFragment() {
             return;
         val uri = data.getData()
         val width = mEdit.measuredWidth - mEdit.paddingLeft - mEdit.paddingRight
-        mEdit.image(uri, width)
+        mEdit.insertImage(uri)
     }
 
     companion object {

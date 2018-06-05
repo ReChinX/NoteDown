@@ -12,9 +12,8 @@ import android.util.Log
 import android.view.Gravity
 
 import com.rechinx.notedown.R
-import com.scrat.app.richtext.RichEditText
 
-class MultiLineDividerEditText : RichEditText {
+class MultiLineDividerEditText : AppCompatEditText {
 
     private var ITEM_HEIGHT = 125f
     internal var reLayout = false
