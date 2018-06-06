@@ -218,9 +218,11 @@ class ExpandedEditText: ScrollView {
         val pattern = Pattern.compile("<img src=\".*?\"/>")
         var tmp = content
         var flag = false
+        var hasImage = false
         while(true) {
             val localMatcher = pattern.matcher(tmp)
             if(!localMatcher.find()) break
+            hasImage = true
             val st = localMatcher.start()
             val ed = localMatcher.end()
 
@@ -264,7 +266,7 @@ class ExpandedEditText: ScrollView {
             tmp = tmp.substring(ed)
         }
         if(!TextUtils.isEmpty(tmp)) {
-            if(!flag) {
+            if(!hasImage) {
                 addEditText(tmp!!)
             }else {
                 lastFocusEditText.setText(tmp!!)
