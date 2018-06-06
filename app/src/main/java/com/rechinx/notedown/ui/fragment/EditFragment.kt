@@ -160,24 +160,12 @@ class EditFragment: BaseFragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId) {
-            R.id.menu_edit_redo -> {
-                if(BuildConfig.DEBUG) {
-                    Log.d(TAG, "now is redo operation")
-                }
-                //mEdit.redo()
-            }
-            R.id.menu_edit_undo -> {
-                if(BuildConfig.DEBUG) {
-                    Log.d(TAG, "now is undo operation")
-                }
-                //mEdit.undo()
-            }
             R.id.menu_edit_pic -> insertImage()
         }
         return super.onOptionsItemSelected(item)
     }
 
-    fun insertImage() {
+    private fun insertImage() {
         val getImage = Intent(Intent.ACTION_GET_CONTENT)
         getImage.addCategory(Intent.CATEGORY_OPENABLE)
         getImage.type = "image/*"

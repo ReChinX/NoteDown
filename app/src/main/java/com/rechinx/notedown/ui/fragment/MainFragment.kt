@@ -16,6 +16,7 @@ import com.goyourfly.multiple.adapter.MultipleSelect
 import com.goyourfly.multiple.adapter.menu.SimpleDeleteMenuBar
 import com.rechinx.notedown.BuildConfig
 import com.rechinx.notedown.R
+import com.rechinx.notedown.base.BaseFragment
 import com.rechinx.notedown.model.NoteItem
 import com.rechinx.notedown.ui.activity.MainActivity
 import com.rechinx.notedown.ui.adapter.NoteAdapter
@@ -30,7 +31,7 @@ import io.reactivex.disposables.CompositeDisposable
 import java.util.*
 
 
-class MainFragment: Fragment() {
+class MainFragment: BaseFragment() {
 
     private val TAG = this.javaClass.simpleName
 
@@ -109,6 +110,9 @@ class MainFragment: Fragment() {
         // always shows fab
         mFab = activity!!.findViewById<FloatingActionButton>(R.id.fab)
         mFab.visibility = View.VISIBLE
+
+        // hide keyboard
+        hideKeyboard()
     }
 
     private fun addOrRemove(adapterPosition: Int) {

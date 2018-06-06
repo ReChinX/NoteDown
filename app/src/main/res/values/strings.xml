@@ -12,4 +12,5 @@
     <string name="menu_edit_undo">UNDO</string>
     <string name="menu_edit_preview">Preview</string>
     <string name="menu_edit_pic">PIC</string>
+    <string name="menu_edit_delete">DELETE</string>
 </resources>
