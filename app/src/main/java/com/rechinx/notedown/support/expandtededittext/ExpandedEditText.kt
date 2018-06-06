@@ -9,7 +9,9 @@ import android.util.AttributeSet
 import com.rechinx.notedown.R
 import android.view.KeyEvent.KEYCODE_DEL
 import android.text.Selection.getSelectionStart
+import android.text.TextUtils
 import android.util.Log
+import android.util.Patterns
 import android.view.*
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
@@ -20,6 +22,10 @@ import com.rechinx.notedown.BuildConfig
 import com.rechinx.notedown.support.glide.GlideApp
 import com.rechinx.notedown.support.glide.GlideRequests
 import com.rechinx.notedown.utils.ScreenUtils
+import java.util.regex.Pattern
+import android.widget.EditText
+
+
 
 class ExpandedEditText: ScrollView {
 
@@ -31,7 +37,7 @@ class ExpandedEditText: ScrollView {
     private var viewTagIndex = 1
     private var container: LinearLayout
     private var inflater: LayoutInflater
-    private var lastFocusEditText: EditText
+    private lateinit var lastFocusEditText: EditText
     private var glideRequests: GlideRequests
     private var mTransitioner: LayoutTransition
     private var keyListener: OnKeyListener
@@ -42,6 +48,7 @@ class ExpandedEditText: ScrollView {
 
     @JvmOverloads
     constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0):super(context, attrs, defStyleAttr) {
+        // gets globals
         inflater = LayoutInflater.from(context)
         glideRequests = GlideApp.with(context)
 
@@ -50,6 +57,9 @@ class ExpandedEditText: ScrollView {
         container.orientation = LinearLayout.VERTICAL
         val layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
         addView(container, layoutParams)
+
+        // init variables
+        editNormalPadding = ScreenUtils.dpToPx(EDIT_PADDING.toFloat()).toInt()
 
         // register listener
         keyListener = OnKeyListener { v, keyCode, event ->
@@ -74,13 +84,6 @@ class ExpandedEditText: ScrollView {
             }
         }
 
-        // configure first edittext
-        val firstEditParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT)
-        editNormalPadding = ScreenUtils.dpToPx(EDIT_PADDING.toFloat()).toInt()
-        val firstEditText = createEditText(ScreenUtils.dpToPx(EDIT_FIRST_PADDING_TOP.toFloat()).toInt())
-        container.addView(firstEditText, firstEditParams)
-        lastFocusEditText = firstEditText
-
         // configure transition
         mTransitioner = LayoutTransition()
         container.layoutTransition = mTransitioner
@@ -94,37 +97,55 @@ class ExpandedEditText: ScrollView {
             override fun endTransition(transition: LayoutTransition,
                                        container: ViewGroup, view: View, transitionType: Int) {
                 if (!transition.isRunning && transitionType == LayoutTransition.CHANGE_DISAPPEARING) {
-                    // transition动画结束，合并EditText
-                    // mergeEditText();
+                    mergeEditText();
                 }
             }
         })
         mTransitioner.setDuration(300)
     }
 
+    private fun mergeEditText() {
+        val preView = container.getChildAt(disappearingImageIndex - 1)
+        val nextView = container.getChildAt(disappearingImageIndex)
+        if (preView != null && preView is EditText && null != nextView
+                && nextView is EditText) {
+            val preEdit = preView as EditText
+            val nextEdit = nextView as EditText
+            val str1 = preEdit.text.toString()
+            val str2 = nextEdit.text.toString()
+            var mergeText = ""
+            if (str2.isNotEmpty()) {
+                mergeText = str1 + "\n" + str2
+            } else {
+                mergeText = str1
+            }
+
+            container.layoutTransition = null
+            container.removeView(nextEdit)
+            preEdit.setText(mergeText)
+            preEdit.requestFocus()
+            preEdit.setSelection(str1.length, str1.length)
+            container.layoutTransition = mTransitioner
+
+        }
+    }
     private fun onBackspacePress(edit: EditText) {
         val startSelection = edit.selectionStart
-        // 只有在光标已经顶到文本输入框的最前方，在判定是否删除之前的图片，或两个View合并
         if (startSelection == 0) {
             val editIndex = container.indexOfChild(edit)
-            val preView = container.getChildAt(editIndex - 1) // 如果editIndex-1<0,
-            // 则返回的是null
+            val preView = container.getChildAt(editIndex - 1)
             if (null != preView) {
                 if (preView is RelativeLayout) {
-                    // 光标EditText的上一个view对应的是图片
                     onImageCloseClick(preView)
                 } else if (preView is EditText) {
-                    // 光标EditText的上一个view对应的还是文本框EditText
                     val str1 = edit.text.toString()
                     val preEdit = preView as EditText
                     val str2 = preEdit.text.toString()
 
-                    // 合并文本view时，不需要transition动画
                     container.layoutTransition = null
                     container.removeView(edit)
-                    container.layoutTransition = mTransitioner // 恢复transition动画
+                    container.layoutTransition = mTransitioner
 
-                    // 文本合并
                     preEdit.setText(str2 + str1)
                     preEdit.requestFocus()
                     preEdit.setSelection(str2.length, str2.length)
@@ -147,7 +168,6 @@ class ExpandedEditText: ScrollView {
         editText.setOnKeyListener(keyListener)
         editText.onFocusChangeListener = focusLisener
         editText.setPadding(editNormalPadding, paddingTop, editNormalPadding, paddingTop)
-        editText.setLineSpacing(42f, 1.0f)
         editText.tag = viewTagIndex++
         return editText
     }
@@ -183,8 +203,77 @@ class ExpandedEditText: ScrollView {
         hideKeyBoard()
     }
 
-    fun fromHtml(content: String) {
+    fun setCursorVisible(flag: Boolean) {
+        lastFocusEditText.isCursorVisible = flag
+    }
 
+    fun fromHtml(content: String?) {
+        if(BuildConfig.DEBUG) {
+            Log.d(TAG, "note from editfragment is $content")
+        }
+        if(TextUtils.isEmpty(content)) {
+            addEditText("")
+            return
+        }
+        val pattern = Pattern.compile("<img src=\".*?\"/>")
+        var tmp = content
+        var flag = false
+        while(true) {
+            val localMatcher = pattern.matcher(tmp)
+            if(!localMatcher.find()) break
+            val st = localMatcher.start()
+            val ed = localMatcher.end()
+
+            if(BuildConfig.DEBUG) {
+                Log.d(TAG, "start is $st and end is $ed")
+            }
+
+            if(st > 0) {
+                val textStr = tmp!!.substring(0, st)
+                if(!flag) {
+                    addEditText(textStr)
+                    flag = true
+                }else {
+                    lastFocusEditText.setText(textStr)
+                }
+            }
+
+            var imgStr = tmp!!.substring(st, ed)
+            val uriIndexStart = imgStr.indexOf("src=")
+            val uriIndexEnd = imgStr.indexOf("/>")
+            val uriStr = imgStr.substring(uriIndexStart + 5, uriIndexEnd - 1)
+            if(BuildConfig.DEBUG) {
+                Log.d(TAG, "There is parser: $imgStr")
+            }
+            val relativeLayout = createImageLayout()
+            val image = relativeLayout.findViewById<DataImageView>(R.id.edit_imageView)
+            image.uri = Uri.parse(uriStr)
+            glideRequests.asBitmap()
+                    .load(Uri.parse(uriStr))
+                    .centerCrop()
+                    .into(object : SimpleTarget<Bitmap>() {
+                        override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                            val imageHeight = width * resource.height / resource.width
+                            val layoutParams = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, imageHeight)
+                            image.setImageBitmap(resource)
+                            image.layoutParams = layoutParams
+                        }
+                    })
+            container.addView(relativeLayout)
+            addEditText("")
+            tmp = tmp.substring(ed)
+        }
+        if(!TextUtils.isEmpty(tmp)) {
+            lastFocusEditText.setText(tmp!!)
+        }
+    }
+
+    private fun addEditText(text: String) {
+        val editParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT)
+        val editText = createEditText(ScreenUtils.dpToPx(EDIT_FIRST_PADDING_TOP.toFloat()).toInt())
+        editText.setText(text)
+        container.addView(editText, editParams)
+        lastFocusEditText = editText
     }
 
     fun toHtml(): String {
@@ -195,7 +284,7 @@ class ExpandedEditText: ScrollView {
                 ret += itemView.text.toString()
             }else if(itemView is RelativeLayout) {
                 val image = itemView.findViewById<DataImageView>(R.id.edit_imageView)
-                ret += "<img src=\"${image.uri}\"/>"
+                ret += "<img src=\"${image.uri.toString()}\"/>"
             }
         }
         return ret
@@ -207,7 +296,7 @@ class ExpandedEditText: ScrollView {
     }
 
     private fun addEditTextAtIndex(lastEditIndex: Int, editTextStr: String) {
-        val editText = createEditText(0)
+        val editText = createEditText(ScreenUtils.dpToPx(EDIT_FIRST_PADDING_TOP.toFloat()).toInt())
         editText.setText(editTextStr)
 
         // edittext without transition
@@ -233,4 +322,17 @@ class ExpandedEditText: ScrollView {
                 })
         container.postDelayed({ container.addView(relativeLayout, lastEditIndex) }, 200)
     }
+
+    fun getTitle(): String {
+        var ret = ""
+        for(i in 0 until container.childCount) {
+            val itemView = container.getChildAt(i)
+            if(itemView is EditText) {
+                ret = itemView.text.toString()
+                break
+            }
+        }
+        return ret
+    }
+
 }

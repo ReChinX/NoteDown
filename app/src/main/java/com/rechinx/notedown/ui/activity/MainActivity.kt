@@ -42,7 +42,7 @@ class MainActivity: BaseActivity(), NavigationView.OnNavigationItemSelectedListe
                     .beginTransaction()
                     .setCustomAnimations(R.anim.slide_in_right_scale, R.anim.slide_out_left,R.anim.slide_in_left,R.anim.slide_out_right)
                     .replace(R.id.fragment_container, fragment)
-                    .addToBackStack(fragment.javaClass.getName())
+                    .addToBackStack(fragment.javaClass.name)
                     .commit()
         }
 

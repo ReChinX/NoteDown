@@ -19,6 +19,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import android.content.Intent
+import android.text.TextUtils
 import com.rechinx.notedown.support.expandtededittext.ExpandedEditText
 
 
@@ -67,8 +68,13 @@ class EditFragment: BaseFragment() {
                     .subscribe({
                         fromNoteItem = it
                         noteContent = it.detail
-                        //mEdit.fromHtml(noteContent)
+                        if(BuildConfig.DEBUG) {
+                            Log.d(TAG, "note from database is $noteContent")
+                        }
+                        mEdit.fromHtml(noteContent)
                     }, {Log.e(TAG, "Unable to get noteitem")}))
+        }else {
+            mEdit.fromHtml("")
         }
 
         setupUI()
@@ -77,7 +83,7 @@ class EditFragment: BaseFragment() {
     override fun onDestroy() {
         super.onDestroy()
         hideKeyboard()
-        //saveNote()
+        saveNote()
     }
     private fun setupUI() {
         // Toolbar setting
@@ -95,38 +101,38 @@ class EditFragment: BaseFragment() {
                     override fun onVisibilityChanged(keyboardVisible: Boolean) {
                         menuFlag = keyboardVisible
                         activity?.invalidateOptionsMenu()
-                        //mEdit.isCursorVisible = keyboardVisible
+                        mEdit.setCursorVisible(keyboardVisible)
                     }
                 })
     }
 
-//
-//    fun saveNote() {
-//        if(BuildConfig.DEBUG) {
-//            Log.d(TAG, "enter the saving notes function")
-//            Log.d(TAG, "Edit text: " + mEdit.toHtml())
-//        }
-//        if(fromObjectId == -1) {
-//            if(!TextUtils.isEmpty(mEdit.toHtml()) && mEdit.toHtml() != "\n") {
-//                val item = NoteItem(mEdit.text.toString(), mEdit.toHtml(), System.currentTimeMillis(), System.currentTimeMillis())
-//                disposable.add(viewModel.insertNote(item)
-//                        .subscribeOn(Schedulers.io())
-//                        .observeOn(AndroidSchedulers.mainThread())
-//                        .subscribe({}, { error -> Log.e(TAG, "Unable to insert note $error")}))
-//            }
-//        }else {
-//            var item = fromNoteItem
-//            if(item.detail != mEdit.toHtml()) {
-//                item.title = mEdit.text.toString()
-//                item.detail = mEdit.toHtml()
-//                item.updatedAt = System.currentTimeMillis()
-//                disposable.add(viewModel.updateNote(item)
-//                        .subscribeOn(Schedulers.io())
-//                        .observeOn(AndroidSchedulers.mainThread())
-//                        .subscribe({}, { error -> Log.e(TAG, "Unable to update note $error")}))
-//            }
-//        }
-//    }
+
+    fun saveNote() {
+        if(BuildConfig.DEBUG) {
+            Log.d(TAG, "enter the saving notes function")
+            Log.d(TAG, "Edit text: " + mEdit.toHtml())
+        }
+        if(fromObjectId == -1) {
+            if(!TextUtils.isEmpty(mEdit.toHtml()) && mEdit.toHtml() != "\n") {
+                val item = NoteItem(mEdit.getTitle(), mEdit.toHtml(), System.currentTimeMillis(), System.currentTimeMillis())
+                disposable.add(viewModel.insertNote(item)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe({}, { error -> Log.e(TAG, "Unable to insert note $error")}))
+            }
+        }else {
+            var item = fromNoteItem
+            if(item.detail != mEdit.toHtml()) {
+                item.title = mEdit.getTitle()
+                item.detail = mEdit.toHtml()
+                item.updatedAt = System.currentTimeMillis()
+                disposable.add(viewModel.updateNote(item)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe({}, { error -> Log.e(TAG, "Unable to update note $error")}))
+            }
+        }
+    }
 
     override fun onResume() {
         super.onResume()
