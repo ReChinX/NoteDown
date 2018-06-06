@@ -154,6 +154,7 @@ class ExpandedEditText: ScrollView {
 
     private fun createImageLayout(): RelativeLayout {
         val layout = inflater.inflate(R.layout.edit_image, null) as RelativeLayout
+        layout.setPadding(editNormalPadding, editNormalPadding, editNormalPadding, editNormalPadding)
         layout.tag = viewTagIndex++
         val closeView = layout.findViewById<View>(R.id.image_close)
         closeView.tag = layout.tag
@@ -187,7 +188,17 @@ class ExpandedEditText: ScrollView {
     }
 
     fun toHtml(): String {
-        return ""
+        var ret = ""
+        for(i in 0 until container.childCount) {
+            val itemView = container.getChildAt(i)
+            if(itemView is EditText) {
+                ret += itemView.text.toString()
+            }else if(itemView is RelativeLayout) {
+                val image = itemView.findViewById<DataImageView>(R.id.edit_imageView)
+                ret += "<img src=\"${image.uri}\"/>"
+            }
+        }
+        return ret
     }
 
     private fun hideKeyBoard() {
@@ -207,7 +218,8 @@ class ExpandedEditText: ScrollView {
 
     private fun addImageViewAtIndex(lastEditIndex: Int, uri: Uri) {
         val relativeLayout = createImageLayout()
-        val image = relativeLayout.findViewById<ImageView>(R.id.edit_imageView)
+        val image = relativeLayout.findViewById<DataImageView>(R.id.edit_imageView)
+        image.uri = uri
         glideRequests.asBitmap()
                 .load(uri)
                 .centerCrop()

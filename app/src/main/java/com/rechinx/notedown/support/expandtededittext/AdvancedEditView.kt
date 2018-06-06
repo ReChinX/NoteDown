@@ -10,9 +10,10 @@ import com.rechinx.notedown.R
 import android.view.inputmethod.InputConnection
 import android.view.inputmethod.InputConnectionWrapper
 import android.view.inputmethod.EditorInfo
+import com.hanks.lineheightedittext.LineHeightEditText
 
 
-class AdvancedEditView : AppCompatEditText {
+class AdvancedEditView : LineHeightEditText {
 
     private val mPaint: Paint = Paint()
 
