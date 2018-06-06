@@ -18,7 +18,7 @@ abstract class BaseActivity: AppCompatActivity() {
     private fun initToolbar() {
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         if(toolbar != null) {
-            toolbar.navigationIcon = VectorDrawableUtils.getMenuDrawable(this)
+            toolbar.navigationIcon = null
             setSupportActionBar(toolbar)
         }
     }

@@ -3,5 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item android:id="@+id/menu_multi_select_delete"
         android:title="@string/menu_multi_select_delete"
+        android:icon="@drawable/ic_delete_white_24dp"
         app:showAsAction="always"/>
 </menu>

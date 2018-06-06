@@ -80,7 +80,7 @@ class MainFragment: BaseFragment() {
     private fun setupUI() {
         toolbar = activity!!.findViewById<Toolbar>(R.id.toolbar)
         activity!!.title = "Note"
-        toolbar.navigationIcon = VectorDrawableUtils.getMenuDrawable(context)
+        toolbar.navigationIcon = null
 
         recyclerView.layoutManager = LinearLayoutManager(context)
         adapter = NoteAdapter(data, context!!)
