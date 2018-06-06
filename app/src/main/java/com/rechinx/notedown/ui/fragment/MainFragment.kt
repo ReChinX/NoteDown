@@ -113,6 +113,19 @@ class MainFragment: BaseFragment() {
 
         // hide keyboard
         hideKeyboard()
+
+        // delete from editfragment
+        viewModel.doRemoveNote().observe(this, android.arch.lifecycle.Observer {
+            var backupList = ArrayList<NoteItem>()
+            it?.let { it1 -> backupList.add(it1) }
+            data.removeAll(backupList)
+            adapter.setData(data)
+            adapter.notifyItemRangeChanged(0, data.size)
+            disposable.add(viewModel.removeNotes(backupList)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({}, {error -> Log.d(TAG, "Unable to delete notes $error")}))
+        })
     }
 
     private fun addOrRemove(adapterPosition: Int) {

@@ -164,6 +164,17 @@ class EditFragment: BaseFragment() {
                 hideKeyboard()
             }
             R.id.menu_edit_pic -> insertImage()
+            R.id.menu_edit_delete -> {
+                if(fromObjectId != -1) {
+                    disposable.add(viewModel.getNoteById(fromObjectId)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe({
+                                viewModel.removeNote(it)
+                                fragmentManager?.popBackStack()
+                            }, {Log.d(TAG, "wrong with get note")}))
+                }
+            }
         }
         return super.onOptionsItemSelected(item)
     }

@@ -1,5 +1,7 @@
 package com.rechinx.notedown.viewmodel
 
+import android.arch.lifecycle.LiveData
+import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
 import com.rechinx.notedown.dao.NoteDao
 import com.rechinx.notedown.model.NoteItem
@@ -7,6 +9,8 @@ import io.reactivex.Completable
 import io.reactivex.Flowable
 
 class NoteViewModel(private val dataSource: NoteDao): ViewModel(){
+
+    private var removal: MutableLiveData<NoteItem> = MutableLiveData()
 
     fun noteList(): Flowable<List<NoteItem>> {
         return dataSource.getNotes()
@@ -33,4 +37,13 @@ class NoteViewModel(private val dataSource: NoteDao): ViewModel(){
             dataSource.deleteNotes(notes)
         }
     }
+
+    fun removeNote(note: NoteItem){
+        removal.value = note
+    }
+
+    fun doRemoveNote(): LiveData<NoteItem> {
+        return removal
+    }
+
 }
