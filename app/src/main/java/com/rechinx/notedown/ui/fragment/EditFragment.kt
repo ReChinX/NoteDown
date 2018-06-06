@@ -160,6 +160,9 @@ class EditFragment: BaseFragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId) {
+            R.id.menu_edit_ok -> {
+                hideKeyboard()
+            }
             R.id.menu_edit_pic -> insertImage()
         }
         return super.onOptionsItemSelected(item)
