@@ -264,7 +264,11 @@ class ExpandedEditText: ScrollView {
             tmp = tmp.substring(ed)
         }
         if(!TextUtils.isEmpty(tmp)) {
-            lastFocusEditText.setText(tmp!!)
+            if(!flag) {
+                addEditText(tmp!!)
+            }else {
+                lastFocusEditText.setText(tmp!!)
+            }
         }
     }
 
