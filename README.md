@@ -10,9 +10,7 @@
 
 ## Application Preview
 
-<img src="./art/1.png" />
-<img src="./art/2.png" />
-<img src="./art/3.png" />
+<img src="./art/1.png" width = "30%" /> <img src="./art/2.png" width = "30%" /> <img src="./art/3.png" width = "30%" />
 
 ## Feathers
 
