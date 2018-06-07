@@ -13,4 +13,6 @@
     <string name="menu_edit_preview">Preview</string>
     <string name="menu_edit_pic">PIC</string>
     <string name="menu_edit_delete">DELETE</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
 </resources>
