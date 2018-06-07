@@ -16,4 +16,10 @@ object Utility {
         val dataSource = provideNoteDao(context)
         return NoteViewModelFactory(dataSource)
     }
+
+    fun calcImageHeight(height: Int, width: Int): Int {
+        val viewWidth = ScreenUtils.deviceWidth - ScreenUtils.dpToPx(56f)
+        return (viewWidth / width * height).toInt()
+    }
+
 }

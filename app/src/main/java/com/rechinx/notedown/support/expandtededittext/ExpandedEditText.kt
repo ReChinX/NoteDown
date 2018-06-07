@@ -24,7 +24,7 @@ import com.rechinx.notedown.support.glide.GlideRequests
 import com.rechinx.notedown.utils.ScreenUtils
 import java.util.regex.Pattern
 import android.widget.EditText
-
+import com.rechinx.notedown.Constants
 
 
 class ExpandedEditText: ScrollView {
@@ -215,7 +215,7 @@ class ExpandedEditText: ScrollView {
             addEditText("")
             return
         }
-        val pattern = Pattern.compile("<img src=\".*?\"/>")
+        val pattern = Pattern.compile(Constants.IMAGE_REGEX)
         var tmp = content
         var flag = false
         var hasImage = false

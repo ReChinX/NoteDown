@@ -1,6 +1,7 @@
 package com.rechinx.notedown.ui.fragment
 
 import android.arch.lifecycle.ViewModelProviders
+import android.content.Context
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.v7.widget.Toolbar
@@ -20,7 +21,9 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import android.content.Intent
 import android.text.TextUtils
+import com.rechinx.notedown.Constants
 import com.rechinx.notedown.support.expandtededittext.ExpandedEditText
+import com.rechinx.notedown.ui.activity.PreviewActivity
 
 
 class EditFragment: BaseFragment() {
@@ -107,7 +110,7 @@ class EditFragment: BaseFragment() {
     }
 
 
-    fun saveNote() {
+    private fun saveNote() {
         if(BuildConfig.DEBUG) {
             Log.d(TAG, "enter the saving notes function")
             Log.d(TAG, "Edit text: " + mEdit.toHtml())
@@ -174,6 +177,11 @@ class EditFragment: BaseFragment() {
                                 fragmentManager?.popBackStack()
                             }, {Log.d(TAG, "wrong with get note")}))
                 }
+            }
+            R.id.menu_edit_preview -> {
+                val intent = Intent(activity, PreviewActivity::class.java)
+                intent.putExtra(Constants.EXTRA_CONTENT, mEdit.toHtml())
+                activity?.startActivity(intent)
             }
         }
         return super.onOptionsItemSelected(item)
